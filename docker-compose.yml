@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+
+  web:
+    build: .
+    container_name: acceso_web
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_NAME: acceso_rfid
+      DB_USER: root
+      DB_PASS: root
+
+  db:
+    image: mysql:8.0
+    container_name: acceso_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: acceso_rfid
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/acceso_rfid.sql:/docker-entrypoint-initdb.d/acceso_rfid.sql
+
+volumes:
+  mysql_data:
