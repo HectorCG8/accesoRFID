@@ -12,7 +12,7 @@ services:
     depends_on:
       - db
     environment:
-      DB_HOST: db
+      DB_HOST: acceso_db
       DB_NAME: acceso_rfid
       DB_USER: root
       DB_PASS: root
@@ -37,4 +37,5 @@ services:
 
 volumes:
   mysql_data:
+
 
