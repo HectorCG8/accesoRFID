@@ -18,27 +18,28 @@ services:
       DB_PASS: root
 
   db:
-  image: mysql:8.0
-  container_name: acceso_db
-  restart: always
-  environment:
-    MYSQL_ROOT_PASSWORD: root
-    MYSQL_DATABASE: acceso_rfid
-  command: [
-    "--default-authentication-plugin=mysql_native_password",
-    "--ssl=0",
-    "--skip-ssl",
-    "--require_secure_transport=OFF"
-  ]
-  ports:
-    - "3306:3306"
-  volumes:
-    - mysql_data:/var/lib/mysql
-    - ./sql/acceso_rfid.sql:/docker-entrypoint-initdb.d/acceso_rfid.sql
+    image: mysql:8.0
+    container_name: acceso_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: acceso_rfid
+    command: [
+      "--default-authentication-plugin=mysql_native_password",
+      "--ssl=0",
+      "--skip-ssl",
+      "--require_secure_transport=OFF"
+    ]
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/acceso_rfid.sql:/docker-entrypoint-initdb.d/acceso_rfid.sql
 
 
 volumes:
   mysql_data:
+
 
 
 
