@@ -1,5 +1,5 @@
 <?php
-$host = getenv("DB_HOST") ?: "acceso_db";
+$host = getenv("DB_HOST") ?: "db";
 $dbname = getenv("DB_NAME") ?: "acceso_rfid";
 $user = getenv("DB_USER") ?: "root";
 $pass = getenv("DB_PASS") ?: "root";
@@ -12,4 +12,5 @@ try {
 }
 
 ?>
+
 
