@@ -1,23 +1,20 @@
 <?php
-require_once "conexion.php"; // usa la conexión correcta con PostgreSQL
-
-// ============================
-// OBTENER DATOS PARA EL DASHBOARD
-// ============================
+session_start();
+require_once "conexion.php";
 
 // Últimos accesos
-$stmt = $pdo->query("
-    SELECT * 
-    FROM historico 
-    ORDER BY fecha_hora DESC 
-    LIMIT 5
-");
+$stmt = $pdo->query("SELECT * FROM historico ORDER BY fecha_hora DESC LIMIT 5");
 $accesos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Usuarios registrados
+// Total de usuarios
 $stmt2 = $pdo->query("SELECT COUNT(*) AS total FROM usuarios");
 $totalUsuarios = $stmt2->fetch(PDO::FETCH_ASSOC)['total'];
+
+// Notificación
+$mensaje = $_SESSION['notificacion'] ?? "";
+unset($_SESSION['notificacion']);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -230,3 +227,4 @@ if (msg.length > 0) {
 
 </body>
 </html>
+
