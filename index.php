@@ -153,11 +153,6 @@ unset($_SESSION['notificacion']);
 </head>
 
 <body>
-<?php 
-session_start();
-$mensaje = $_SESSION['notificacion'] ?? "";
-unset($_SESSION['notificacion']);
-?>
 
 <div class="container">
 
@@ -227,4 +222,5 @@ if (msg.length > 0) {
 
 </body>
 </html>
+
 
