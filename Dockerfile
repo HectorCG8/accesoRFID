@@ -5,7 +5,7 @@ FROM php:8.2-apache
 RUN docker-php-ext-install pdo pdo_pgsql pgsql
 
 # Copiar tu código PHP/HTML al contenedor
-COPY ./php-app /var/www/html/
+COPY . /var/www/html/
 
 # Cambiar permisos si es necesario
 RUN chown -R www-data:www-data /var/www/html
@@ -14,3 +14,4 @@ RUN chown -R www-data:www-data /var/www/html
 EXPOSE 80
 
 # Apache ya se inicia automáticamente con esta imagen
+
