@@ -1,5 +1,5 @@
 <?php
-require_once "config.php";  // Asegúrate de tener tu archivo de conexión con PDO
+require_once "conexion.php";  // Conexión correcta
 
 if (!isset($_GET['id'])) {
     echo "ID no proporcionado.";
@@ -41,9 +41,9 @@ if (!$user) {
     exit;
 }
 
-// Eliminar historial del usuario
-$delHistorial = $pdo->prepare("DELETE FROM historico WHERE user_id = ?");
-$delHistorial->execute([$id]);
+// 🔥 CORRECCIÓN CRÍTICA: historico no tiene user_id → borrar por UID
+$delHistorial = $pdo->prepare("DELETE FROM historico WHERE uid = ?");
+$delHistorial->execute([$user['uid']]);
 
 // Eliminar usuario
 $eliminar = $pdo->prepare("DELETE FROM usuarios WHERE id = ?");
@@ -74,3 +74,4 @@ echo "
     '>Volver</a>
 </div>
 ";
+?>
