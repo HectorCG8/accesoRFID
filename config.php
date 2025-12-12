@@ -1,5 +1,5 @@
 <?php
-$host = "localhost";
+$host = "bd-container";
 $dbname = "acceso_rfid";
 $username = "root";
 $password = "";
@@ -12,3 +12,4 @@ catch (PDOException $e) {
     die("Error de conexión: " . $e->getMessage());
 }
 ?>
+
