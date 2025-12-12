@@ -1,46 +1,36 @@
-version: "3.8"
+name: monitoring-system
 
 services:
-
-  web:
-    build: .
-    container_name: acceso_web
+  db:
+    image: postgres
+    container_name: bd-container
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 123456789
+      POSTGRES_DB: acceso_rfid
     ports:
-      - "80:80"
-    volumes:
-      - .:/var/www/html
+      - 6000:5432  # Mapea el puerto interno 5432 de PostgreSQL al 6000 de la máquina
+    networks:
+      - backend
+
+  php:
+    build: .
+    image: php-app
+    container_name: app-container
+    ports:
+      - 5000:80   # Apache puerto 80 → 5000 de tu máquina/EC2
+    networks:
+      - frontend
+      - backend
     depends_on:
       - db
     environment:
       DB_HOST: db
-      DB_NAME: acceso_rfid
+      DB_PORT: 5432
       DB_USER: root
-      DB_PASS: root
+      DB_PASSWORD: 123456789
+      DB_NAME: acceso_rfid
 
-  db:
-    image: mysql:8.0
-    container_name: acceso_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: acceso_rfid
-    command: [
-      "--default-authentication-plugin=mysql_native_password",
-      "--ssl=0",
-      "--skip-ssl",
-      "--require_secure_transport=OFF"
-    ]
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./sql/acceso_rfid.sql:/docker-entrypoint-initdb.d/acceso_rfid.sql
-
-
-volumes:
-  mysql_data:
-
-
-
-
-
+networks:
+  frontend: {}
+  backend: {}
