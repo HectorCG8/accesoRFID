@@ -2,7 +2,7 @@
 $host = getenv("DB_HOST") ?: "bd-container";
 $dbname = getenv("DB_NAME") ?: "acceso_rfid";
 $user = getenv("DB_USER") ?: "root";
-$pass = getenv("DB_PASS") ?: "root";
+$pass = getenv("DB_PASS") ?: "123456789";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -12,6 +12,7 @@ try {
 }
 
 ?>
+
 
 
 
