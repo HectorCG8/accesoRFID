@@ -1,14 +1,14 @@
 <?php
-require_once "config.php";
+require_once "conexion.php";
 
 // Número de registros por página
 $porPagina = 10;
 
-// ¿Qué página estás viendo?
+// Página actual
 $pagina = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
 if ($pagina < 1) $pagina = 1;
 
-// Calcular desde qué registro iniciar
+// Calcular offset
 $inicio = ($pagina - 1) * $porPagina;
 
 // Obtener total de registros
@@ -17,11 +17,17 @@ $totalRegistros = $totalQuery->fetchColumn();
 
 $totalPaginas = ceil($totalRegistros / $porPagina);
 
-// Obtener solo los registros de esta página
-$stmt = $pdo->prepare("SELECT * FROM historico ORDER BY fecha_hora DESC LIMIT :ini, :pp");
-$stmt->bindValue(':ini', $inicio, PDO::PARAM_INT);
+// Obtener registros de esta página (POSTGRESQL CORRECTO)
+$stmt = $pdo->prepare("
+    SELECT * 
+    FROM historico 
+    ORDER BY fecha_hora DESC 
+    LIMIT :pp OFFSET :ini
+");
 $stmt->bindValue(':pp', $porPagina, PDO::PARAM_INT);
+$stmt->bindValue(':ini', $inicio, PDO::PARAM_INT);
 $stmt->execute();
+
 $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -70,8 +76,8 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .verde { color: #16a34a; font-weight: bold; }
         .amarillo { color: #ca8a04; font-weight: bold; }
+        .rojo { color: red; font-weight: bold; }
 
-        /* Botón volver */
         .btn-volver {
             display: block;
             width: 180px;
@@ -87,7 +93,6 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         .btn-volver:hover { background: #4338ca; }
 
-        /* Paginación */
         .paginacion {
             text-align: center;
             margin-top: 20px;
@@ -109,10 +114,6 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: #a5b4fc;
             pointer-events: none;
         }
-        .rojo { 
-        color: red; 
-        font-weight: bold; 
-        }
     </style>
 </head>
 <body>
@@ -131,15 +132,18 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <tbody>
         <?php foreach ($registros as $r): ?>
         <tr>
-            <td><?= $r['nombre'] ?></td>
-            <td><?= $r['uid'] ?></td>
-            <td class="<?= 
-            $r['tipo_evento'] == 'entrada' ? 'verde' : 
-            ($r['tipo_evento'] == 'salida' ? 'amarillo' : 'rojo') 
+            <td><?= htmlspecialchars($r['nombre']) ?></td>
+            <td><?= htmlspecialchars($r['uid']) ?></td>
+
+            <!-- Color dinámico -->
+            <td class="<?=
+                $r['tipo_evento'] == 'entrada' ? 'verde' :
+                ($r['tipo_evento'] == 'salida' ? 'amarillo' : 'rojo')
             ?>">
-            <?= strtoupper($r['tipo_evento']) ?>
+                <?= strtoupper(htmlspecialchars($r['tipo_evento'])) ?>
             </td>
-            <td><?= $r['fecha_hora'] ?></td>
+
+            <td><?= htmlspecialchars($r['fecha_hora']) ?></td>
         </tr>
         <?php endforeach; ?>
     </tbody>
@@ -147,14 +151,12 @@ $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!-- PAGINACIÓN -->
 <div class="paginacion">
-    <!-- Botón anterior -->
     <?php if ($pagina > 1): ?>
         <a href="?pagina=<?= $pagina - 1 ?>">◀ Anterior</a>
     <?php else: ?>
         <a class="disabled">◀ Anterior</a>
     <?php endif; ?>
 
-    <!-- Botón siguiente -->
     <?php if ($pagina < $totalPaginas): ?>
         <a href="?pagina=<?= $pagina + 1 ?>">Siguiente ▶</a>
     <?php else: ?>
