@@ -2,7 +2,7 @@
 $host = "bd-container";
 $dbname = "acceso_rfid";
 $username = "root";
-$password = "";
+$password = "123456789";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
@@ -12,4 +12,5 @@ catch (PDOException $e) {
     die("Error de conexión: " . $e->getMessage());
 }
 ?>
+
 
