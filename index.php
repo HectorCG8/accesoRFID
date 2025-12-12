@@ -1,25 +1,17 @@
 <?php
-// ============================
-//  CONEXIÓN A LA BASE DE DATOS
-// ============================
-$host = "localhost";
-$dbname = "acceso_rfid";
-$user = "root";
-$pass = "";
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Error en la conexión: " . $e->getMessage());
-}
+require_once "conexion.php"; // usa la conexión correcta con PostgreSQL
 
 // ============================
-//  OBTENER DATOS PARA EL DASHBOARD
+// OBTENER DATOS PARA EL DASHBOARD
 // ============================
 
-// Últimos accesos (entradas/salidas)
-$stmt = $pdo->query("SELECT * FROM historico ORDER BY fecha_hora DESC LIMIT 5");
+// Últimos accesos
+$stmt = $pdo->query("
+    SELECT * 
+    FROM historico 
+    ORDER BY fecha_hora DESC 
+    LIMIT 5
+");
 $accesos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Usuarios registrados
@@ -56,7 +48,6 @@ $totalUsuarios = $stmt2->fetch(PDO::FETCH_ASSOC)['total'];
         color: #333;
     }
 
-    /* Tarjetas del dashboard */
     .cards {
         display: flex;
         gap: 20px;
@@ -84,7 +75,6 @@ $totalUsuarios = $stmt2->fetch(PDO::FETCH_ASSOC)['total'];
         color: #4f46e5;
     }
 
-    /* Botones */
     .btn {
         display: inline-block;
         padding: 12px 20px;
@@ -101,7 +91,6 @@ $totalUsuarios = $stmt2->fetch(PDO::FETCH_ASSOC)['total'];
         background: #372fde;
     }
 
-    /* Tabla */
     table {
         width: 100%;
         border-collapse: collapse;
@@ -128,52 +117,41 @@ $totalUsuarios = $stmt2->fetch(PDO::FETCH_ASSOC)['total'];
         background: #f1f5ff;
     }
 
-    .entrada {
-        color: green;
-        font-weight: 600;
-    }
+    .entrada { color: green; font-weight: 600; }
+    .salida { color: orange; font-weight: 600; }
+    .denegado { color: red; font-weight: 600; }
 
-    .salida {
-        color: orange;
-        font-weight: 600;
-    }
     .btn-primario {
-    display: inline-block;
-    padding: 12px 20px;
-    background: #4f46e5;
-    color: white;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    margin: 10px 0;
-    transition: .2s;
-}
+        display: inline-block;
+        padding: 12px 20px;
+        background: #4f46e5;
+        color: white;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        margin: 10px 0;
+        transition: .2s;
+    }
 
-.btn-primario:hover {
-    background: #3730a3;
-}
-.toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #0d6efd;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    opacity: 0;
-    transition: .4s;
-    font-family: Poppins;
-    z-index: 9999;
-}
-.toast.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-.denegado {
-    color: red;
-    font-weight: 600;
-}
+    .btn-primario:hover {
+        background: #3730a3;
+    }
+
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #0d6efd;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        opacity: 0;
+        transition: .4s;
+        font-family: Poppins;
+        z-index: 9999;
+    }
+    .toast.show { opacity: 1; }
 </style>
 </head>
 
@@ -183,20 +161,16 @@ session_start();
 $mensaje = $_SESSION['notificacion'] ?? "";
 unset($_SESSION['notificacion']);
 ?>
+
 <div class="container">
 
     <h1>Dashboard de Control de Acceso RFID</h1>
 
-    <!-- Tarjetas -->
     <div class="cards">
         <div class="card">
             <h3>Usuarios Registrados</h3>
             <p><?= $totalUsuarios ?></p>
         </div>
-    <div style="margin-top:20px;">
-    <a href="ver_usuarios.php" class="btn-primario">Ver Usuarios Registrados</a><p></p>
-    <a href="promedios.php" class="btn-primario">Ver Promedio de Accesos</a>
-    </div>
 
         <div class="card">
             <h3>Último Movimiento</h3>
@@ -211,55 +185,46 @@ unset($_SESSION['notificacion']);
 
     <div id="toast" class="toast"><?= $mensaje ?></div>
 
-    <script>
-    let msg = "<?= $mensaje ?>";
-    if (msg.length > 0) {
+<script>
+let msg = "<?= $mensaje ?>";
+if (msg.length > 0) {
     const t = document.getElementById("toast");
     t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3500);
+}
+</script>
 
-    setTimeout(() => {
-        t.classList.remove("show");
-    }, 3500);
-    }
-    </script>
+<h2>Últimos movimientos</h2>
 
-    <!-- Tabla de últimos accesos -->
-    <h2>Últimos movimientos</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>UID</th>
+            <th>Tipo</th>
+            <th>Fecha y Hora</th>
+        </tr>
+    </thead>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>UID</th>
-                <th>Tipo</th>
-                <th>Fecha y Hora</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($accesos as $a): ?>
-            <tr>
-                <td><?= $a['nombre'] ?></td>
-                <td><?= $a['uid'] ?></td>
-                <?php
-                    $tipo = strtolower($a['tipo_evento']);
+    <tbody>
+    <?php foreach ($accesos as $a): ?>
+        <tr>
+            <td><?= htmlspecialchars($a['nombre']) ?></td>
+            <td><?= htmlspecialchars($a['uid']) ?></td>
 
-                    if ($tipo === 'entrada') {
-                        $clase = 'entrada';
-                        $texto = 'ENTRADA';
-                    } elseif ($tipo === 'salida') {
-                        $clase = 'salida';
-                        $texto = 'SALIDA';
-                    } else {
-                        $clase = 'denegado';
-                        $texto = 'DENEGADO';
-                    }
-                    ?>
-                    <td class="<?= $clase ?>"><?= $texto ?></td>
-                <td><?= $a['fecha_hora'] ?></td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
+            <?php
+                $tipo = strtolower($a['tipo_evento']);
+                $clase = $tipo === 'entrada' ? 'entrada' :
+                         ($tipo === 'salida' ? 'salida' : 'denegado');
+                $texto = strtoupper($tipo);
+            ?>
+
+            <td class="<?= $clase ?>"><?= $texto ?></td>
+            <td><?= htmlspecialchars($a['fecha_hora']) ?></td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
 
 </div>
 
