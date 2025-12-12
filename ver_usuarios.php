@@ -1,7 +1,8 @@
 <?php
-require_once "conexion.php"; // IMPORTANTE — CREA $conn
+require_once "conexion.php"; // IMPORTANTE: este archivo crea $pdo
 
-$sql = $pdo->query("SELECT * FROM usuarios");
+// Obtener todos los usuarios
+$sql = $pdo->query("SELECT * FROM usuarios ORDER BY id ASC");
 ?>
 
 <!DOCTYPE html>
@@ -46,9 +47,9 @@ $sql = $pdo->query("SELECT * FROM usuarios");
 
     <?php foreach ($sql as $row): ?>
     <tr>
-        <td><?= $row['id'] ?></td>
-        <td><?= $row['nombre'] ?></td>
-        <td><?= $row['uid'] ?></td>
+        <td><?= htmlspecialchars($row['id']) ?></td>
+        <td><?= htmlspecialchars($row['nombre']) ?></td>
+        <td><?= htmlspecialchars($row['uid']) ?></td>
         <td>
             <a href="eliminar_usuario.php?id=<?= $row['id'] ?>" class="btn-delete"
             onclick="return confirm('¿Eliminar este usuario?');">
