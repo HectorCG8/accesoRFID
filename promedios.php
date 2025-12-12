@@ -4,12 +4,36 @@ require_once "conexion.php";
 /* ==========================
    PROMEDIOS POR USUARIO
    ========================== */
+
+// Convertido de MySQL → PostgreSQL
 $sqlProm = $pdo->query("
     SELECT 
         nombre,
-        SEC_TO_TIME(AVG(CASE WHEN tipo_evento = 'entrada' THEN TIME_TO_SEC(TIME(fecha_hora)) END)) AS promedio_entrada,
-        SEC_TO_TIME(AVG(CASE WHEN tipo_evento = 'salida' THEN TIME_TO_SEC(TIME(fecha_hora)) END)) AS promedio_salida,
+        
+        -- PROMEDIO DE HORA DE ENTRADA (PostgreSQL)
+        TO_CHAR(
+            AVG(
+                CASE 
+                    WHEN tipo_evento = 'entrada' 
+                    THEN fecha_hora::time 
+                END
+            ),
+            'HH24:MI:SS'
+        ) AS promedio_entrada,
+
+        -- PROMEDIO DE HORA DE SALIDA (PostgreSQL)
+        TO_CHAR(
+            AVG(
+                CASE 
+                    WHEN tipo_evento = 'salida' 
+                    THEN fecha_hora::time 
+                END
+            ),
+            'HH24:MI:SS'
+        ) AS promedio_salida,
+
         COUNT(*) AS total_accesos
+
     FROM historico
     GROUP BY nombre
 ");
@@ -17,20 +41,22 @@ $sqlProm = $pdo->query("
 /* ==========================
    DIAS CON MÁS ACCESOS
    ========================== */
+
+// DATE(fecha_hora) → fecha_hora::date
 $sqlDias = $pdo->query("
     SELECT 
-        DATE(fecha_hora) AS dia,
+        fecha_hora::date AS dia,
         COUNT(*) AS accesos
     FROM historico
-    GROUP BY DATE(fecha_hora)
+    GROUP BY fecha_hora::date
     ORDER BY accesos DESC
     LIMIT 10
 ");
 ?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang=\"es\">
 <head>
-<meta charset="UTF-8">
+<meta charset=\"UTF-8\">
 <title>Promedios de Acceso</title>
 
 <style>
@@ -89,8 +115,8 @@ h2 {
     <?php while ($row = $sqlProm->fetch(PDO::FETCH_ASSOC)): ?>
     <tr>
         <td><?= $row['nombre'] ?></td>
-        <td><?= $row['promedio_entrada'] ?? 'N/A' ?></td>
-        <td><?= $row['promedio_salida'] ?? 'N/A' ?></td>
+        <td><?= $row['promedio_entrada'] ?: 'N/A' ?></td>
+        <td><?= $row['promedio_salida'] ?: 'N/A' ?></td>
         <td><?= $row['total_accesos'] ?></td>
     </tr>
     <?php endwhile; ?>
@@ -116,7 +142,7 @@ h2 {
 
 </table>
 
-<a href="index.php" class="btn-volver">Volver</a>
+<a href=\"index.php\" class=\"btn-volver\">Volver</a>
 
 </body>
 </html>
