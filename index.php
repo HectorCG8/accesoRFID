@@ -173,6 +173,8 @@ unset($_SESSION['notificacion']);
     <div style="margin-bottom: 20px;">
         <a href="registro.php" class="btn">Registrar Usuario</a>
         <a href="historico.php" class="btn">Ver Histórico</a>
+        <a href="ver_usuarios.php" class="btn-primario">Ver Usuarios Registrados</a>
+        <a href="promedios.php" class="btn-primario">Ver Promedio de Accesos</a>
     </div>
 
     <div id="toast" class="toast"><?= $mensaje ?></div>
@@ -222,5 +224,6 @@ if (msg.length > 0) {
 
 </body>
 </html>
+
 
 
