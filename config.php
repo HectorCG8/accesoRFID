@@ -1,16 +1,18 @@
 <?php
-$host = "bd-container";
-$dbname = "acceso_rfid";
-$username = "root";
-$password = "123456789";
+
+$host = getenv("DB_HOST") ?: "db";
+$port = getenv("DB_PORT") ?: "5432";
+$dbname = getenv("DB_NAME") ?: "acceso_rfid";
+$user = getenv("DB_USER") ?: "root";
+$pass = getenv("DB_PASSWORD") ?: "123456789";
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} 
-catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
+    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
+    $pdo = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+} catch (PDOException $e) {
+    die("ERROR DB: " . $e->getMessage());
 }
+
 ?>
-
-
