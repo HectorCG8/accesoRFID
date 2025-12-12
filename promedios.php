@@ -142,7 +142,8 @@ h2 {
 
 </table>
 
-<a href=\"index.php\" class=\"btn-volver\">Volver</a>
+<a href=\index.php class="btn-volver">Volver</a>
 
 </body>
 </html>
+
